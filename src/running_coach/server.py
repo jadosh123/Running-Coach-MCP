@@ -3,9 +3,24 @@ from mcp.server.mcpserver.exceptions import ToolError
 from running_coach import db
 from running_coach.models import Activity, ActivitySplit
 from running_coach import sync
+from running_coach.garmin import get_client
+from garminconnect.workout import RunningWorkout, WorkoutSegment, ExecutableStep
 from typing import Any
 
 mcp = MCPServer("Running Coach")
+
+
+@mcp.tool()
+def upload_running_workout(targets: list[str]):
+    client = get_client()
+    
+
+    workout = RunningWorkout(
+        workoutName="",
+
+    )
+
+    client.upload_running_workout()
 
 
 @mcp.tool()
