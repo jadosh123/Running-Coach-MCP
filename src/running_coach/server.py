@@ -120,7 +120,3 @@ def get_recent_notes(limit: int = 5) -> list[dict[str, Any]]:
     don't know which activity they belong to. Returns [] if none."""
     with db.connection() as conn:
         return db.get_recent_notes(conn, limit)
-
-
-if __name__ == "__main__":
-    mcp.run()

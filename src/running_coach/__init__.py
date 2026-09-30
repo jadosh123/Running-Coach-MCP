@@ -1,2 +1,9 @@
+from running_coach.server import mcp
+
+
 def main() -> None:
-    print("Hello from running-coach!")
+    mcp.run()
+
+
+if __name__ == "__main__":
+    main()
