@@ -1,26 +1,43 @@
 from mcp.server import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from running_coach import db
-from running_coach.models import Activity, ActivitySplit
+from running_coach.models import Activity, ActivitySplit, WorkoutTarget
 from running_coach import sync
 from running_coach.garmin import get_client
-from garminconnect.workout import RunningWorkout, WorkoutSegment, ExecutableStep
+from running_coach.workout_builder import build_running_workout
+from garminconnect.exceptions import GarminConnectConnectionError, GarminConnectTooManyRequestsError
 from typing import Any
 
 mcp = MCPServer("Running Coach")
 
 
 @mcp.tool()
-def upload_running_workout(targets: list[str]):
+def push_workout_to_watch(workout_id: int) -> Any:
+    """Push an already-uploaded workout straight to the connected watch,
+    bypassing the calendar. Use the workoutId returned by
+    upload_running_workout."""
     client = get_client()
-    
+    try:
+        return client.push_workout_to_device(workout_id=workout_id)
+    except GarminConnectConnectionError as e:
+        raise ToolError(f"Garmin couldn't push the workout: {e}") from e
 
-    workout = RunningWorkout(
-        workoutName="",
 
-    )
-
-    client.upload_running_workout()
+@mcp.tool()
+def upload_running_workout(workout_name: str, targets: list[WorkoutTarget]):
+    """Upload a structured running workout to Garmin Connect. Each item in
+    targets is one ordered step with a cadence, heart rate, or pace goal,
+    ending after a set duration or distance. Steps run in the order given.
+    This only creates the workout in Garmin Connect; it does not schedule
+    it onto a date. Returns the created workout's data, including its id."""
+    client = get_client()
+    workout = build_running_workout(workout_name, targets)
+    try:
+        return client.upload_running_workout(workout)
+    except GarminConnectConnectionError as e:
+        raise ToolError(f"Garmin rejected the workout: {e}. Check the target and end-condition values before retrying.") from e
+    except GarminConnectTooManyRequestsError as e:
+        raise ToolError("Garmin rate-limited this request. Wait a bit before retrying.") from e
 
 
 @mcp.tool()
