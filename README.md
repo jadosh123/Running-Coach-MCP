@@ -1,6 +1,6 @@
 # running-coach
 
-An MCP server that gives Claude (or any MCP client) access to your Garmin running data.
+An MCP server that gives Claude Code (or any MCP client) access to your Garmin running data.
 
 ## Status
 
@@ -11,6 +11,13 @@ The core loop works end-to-end: Garmin login, sync, and local storage, plus an M
 Syncs your Garmin running activities into a local SQLite database, including per-activity summaries and per-lap splits (1 km by default, depending on your watch's auto-lap setting). It also has a notes table for free-text observations, such as pains or how a run felt. The MCP server exposes tools so an LLM can look up runs, read and write notes, analyze trends over time, and build and push structured workouts — cadence, heart rate, or pace targets — to your Garmin device.
 
 Everything runs locally. Your data stays on your machine, and your Garmin password is never stored.
+
+## Demo
+![alt text](static/sc1.png)
+![alt text](static/sc2.png)
+![alt text](static/sc3.png)
+![alt text](static/sc4.png)
+![alt text](static/sc5.png)
 
 ## Architecture
 
